@@ -1,0 +1,8 @@
+http://0.0.0.0:4567/banks
+http://0.0.0.0:4567/boards
+http://0.0.0.0:4567/brokers
+http://0.0.0.0:4567/dice
+http://0.0.0.0:4567/games
+http://0.0.0.0:4567/jail
+http://0.0.0.0:4567/player
+http://vs-docker.informatik.haw-hamburg.de/ports/8053/services

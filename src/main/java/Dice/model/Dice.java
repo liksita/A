@@ -1,17 +1,20 @@
 package Dice.model;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
+
+import Boards.modell.Board;
 
 /**
  * Created by diana on 01.11.15.
  */
 public class Dice {
 
-    private Roll roll;
+    private int nummer;
 
-    public Roll roll() {
-        Random rnd = new Random();
-        roll = new Roll(rnd.nextInt(6) + 1);
-        return roll;
-    }
+    public Dice() {
+		this.nummer = new Random().nextInt(6) + 1;
+	}
+
 }

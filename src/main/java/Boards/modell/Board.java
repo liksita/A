@@ -1,40 +1,74 @@
 package Boards.modell;
 
-/**
- - board: |
- {
-     "type": "object",
-     "$schema": "http://json-schema.org/draft-03/schema",
-     "id": "board",
-     "required": true,
-     "properties": {
-         "fields": {    "type": "array",
-                        "items": {"$ref": "field" },
-                        "required": true,
-                        "description":"list of fields of the board"  },
-         "positions": { "type": "object",
-                        "properties": { "{playerid}":"int" },
-                        "required": true,
-                        "description":"a map of playerid to position on the board"  }
-     }
- }
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
- /boards:
- type:
- list:
- schema: "board"
- example: |
- [{
-     "fields":[
-         {"place": "/boards/42/places/0" ,"players":[]},
-         {"place": "/boards/42/places/1" ,"players":[]},
-         {"place": "/boards/42/places/2" ,"players":[]},
-         {"place": "/boards/42/places/3" ,"players":[]},
-         {"place":{"name":"Einkommensteuer"},"players":[{"id":"Mario","place":"/boards/42/places/2", "position":4}]}
-    ]
- }]
+import Boards.service.Field;
+import Player.model.Player;
 
- */
 public class Board {
+	private String gameid;
 
+	private List<Field> fields = new ArrayList<>();
+	private List<String> players = new ArrayList<>();
+	private Map<String, Integer> positions = new HashMap<>();
+	private String uri;
+
+	public Board(String gameid) {
+		this.gameid = gameid;
+	}
+
+	public String getGameid() {
+		return gameid;
+	}
+
+	public boolean addPlayer(String playerID) {
+		for (String pID : players) {
+			if (pID.equals(playerID)) {
+				// player exist
+				return false;
+			}
+		}
+		return players.add(playerID);
+	}
+
+	public boolean removePlayer(String playerid) {
+		for (String p : players) {
+			if (p.equals(playerid)) {
+				return players.remove(p);
+			}
+		}
+		// players not exist
+		return false;
+	}
+
+	public String getPlayer(String playerid) {
+		for (String p : players) {
+			if (p.equals(playerid)) {
+				return p;
+			}
+		}
+		// player not exist
+		return null;
+	}
+
+	public List<String> getPlayers() {
+		return players;
+	}
+
+	public List<Field> getFields() {
+		return fields;
+	}
+
+	public Field findPlace(String place) {
+		for (Field f : fields) {
+			if (f.getPlace().getName().equals(place)) {
+				return f;
+			}
+		}
+		// field not exist
+		return null;
+	}
 }

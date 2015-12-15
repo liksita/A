@@ -1,7 +1,7 @@
 package Game.service;
 
 import Game.model.Game;
-import Game.model.Player;
+import Player.model.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +57,6 @@ public class GameService {
 
     public Player setPlayerReady(String gameId, String playerId) {
         Game game = findGame(gameId);
-
         // wenn spiel nicht gestartet ist, dann registriere player als "ready"
         if (!game.readyToStart()) {
             Player player = getPlayer(gameId, playerId);

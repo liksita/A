@@ -3,6 +3,8 @@ package Game.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import Player.model.Player;
+
 /**
  * - game: |
  * {
@@ -62,7 +64,6 @@ public class Game {
     //==================================================================
     // Player
     //==================================================================
-
     public List<Player> getPlayers() {
         return players;
     }
@@ -99,6 +100,5 @@ public class Game {
     public void setComponents(Components components) {
         this.components = components;
     }
-
 }
 
