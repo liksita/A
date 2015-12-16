@@ -1,6 +1,8 @@
 package Bank.service;
 
+import Bank.model.Account;
 import Bank.model.Bank;
+import Bank.model.Service;
 import Bank.model.Transfer;
 import Player.model.Player;
 import com.google.gson.Gson;
@@ -8,8 +10,12 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.GetRequest;
 
 import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import static util.JsonUtil.readUrl;
 
@@ -17,79 +23,151 @@ import static util.JsonUtil.readUrl;
  * Created by m on 24.11.15.
  */
 public class BankService {
-    private ArrayList<Bank> banks = new ArrayList<>();
 
+	private ArrayList<Bank> banks = new ArrayList<>();
 
-    public Bank findBank(String gameID) {
-        for (Bank bank : banks) {
-            if (bank.getBankID().equals(gameID)) {
-                return bank;
-            }
-        }
-        return null;
-    }
+	private static Service service = new Service("Games", "Game Service", "games",
+			"https://vs-docker.informatik.haw-hamburg.de/ports/14470/games");
 
-    public ArrayList<Transfer> getTransfers(String gameID) {
-        Bank bank = findBank(gameID);
-        return bank.getTransfers();
-    }
+	private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
 
-    public ArrayList<Bank> getBanks() {
-        return banks;
-    }
+	public void register() {
+		Gson gson = new Gson();
 
-    public Bank createBank(String gameID) {
+		try {
+			HttpResponse<JsonNode> response = Unirest.post(serviceRegistrationUri).header("accept", "application/json")
+					.header("content-type", "application/json").body(gson.toJson(service)).asJson();
 
-        Bank bank = new Bank(gameID);
-        banks.add(bank);
-        return bank;
-    }
+			System.out.println("Status: " + response.getStatus() + " Body:" + response.getBody().toString());
+		} catch (UnirestException e) {
+			e.printStackTrace();
+		}
+	}
 
-//    public HashMap<String, Account> getAccounts() {
-//        return accounts;
-//    }
+	public Bank findBank(String gameID) {
+		for (Bank bank : banks) {
+			if (bank.getBankID().equals(gameID)) {
+				return bank;
+			}
+		}
+		return null;
+	}
 
-    public Transfer findTransfers(String gameID, String transferID) {
+	public ArrayList<Transfer> getTransfers(String gameID) {
+		Bank bank = findBank(gameID);
+		return bank.getTransfers();
+	}
 
-        for (Transfer transfer : getTransfers(gameID)) {
-            if (transfer.getID().equals(transferID)) return transfer;
-        }
-        return null;
-    }
+	public ArrayList<Bank> getBanks() {
+		return banks;
+	}
 
-    public Transfer transferFromTo(String gameID, String from, String to, String amount, String reason) {
-        Bank bank = findBank(gameID);
-        int amountValue = Integer.parseInt(amount);
-        //player from, to test
-        Transfer transfer = new Transfer(from, to, amountValue, reason, "event");
-        bank.addTransfer(transfer);
-        return transfer;
-    }
+	public Bank createBank(String gameID) {
 
-    public HttpResponse<JsonNode> getPlayers(String gameID) {
-        HttpResponse<JsonNode> players = null;
-        try {
-            players = Unirest.get("http://localhost:4567/games/" + gameID + "/players").asJson();
-////           String gameGson = readUrl("http://0.0.0.0:4567/games/" + gameID);
-//            final Game game = gson.fromJson(gameGson, Game.class);
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-        if (players != null) {
-            return players;
-        }
-        return null;
-    }
+		Bank bank = new Bank(gameID);
+		banks.add(bank);
+		return bank;
+	}
 
-    public ArrayList<Player> getPlayersString(String gameID) throws Exception {
+	// public HashMap<String, Account> getAccounts() {
+	// return accounts;
+	// }
 
-//        GetRequest players = Unirest.get("http://localhost:4567/games" + "/" + gameID + "/players");
-////           String gameGson = readUrl("http://0.0.0.0:4567/games/" + gameID);
-//            final Game game = gson.fromJson(gameGson, Game.class);
-        String playersGson = readUrl("http://0.0.0.0:4567/games/" + gameID + "/players");
-        Gson gson = new Gson();
-        ArrayList<Player> players = gson.fromJson(playersGson, ArrayList.class);
-        return  players;
+	public Transfer findTransfers(String gameID, String transferID) {
 
-    }
+		for (Transfer transfer : getTransfers(gameID)) {
+			if (transfer.getID().equals(transferID))
+				return transfer;
+		}
+		return null;
+	}
+
+	public Transfer transferFromTo(String gameID, String from, String to, String amount, String reason) {
+		Bank bank = findBank(gameID);
+		int amountValue = Integer.parseInt(amount);
+		// player from, to test
+		Transfer transfer = new Transfer(from, to, amountValue, reason, "event");
+		for (Account a : bank.getAccounts()) {
+			if (a.getPlayer().equals(from)) {
+				a.takeSaldo(amountValue);
+			}
+			if (a.getPlayer().equals(to)) {
+				a.addSaldo(amountValue);
+			}
+		}
+		bank.addTransfer(transfer);
+		return transfer;
+	}
+
+	public Transfer transferFrom(String gameID, String to, String amount, String reason) {
+		Bank bank = findBank(gameID);
+		int amountValue = Integer.parseInt(amount);
+		// player from, to test
+		Transfer transfer = new Transfer(bank.getBankID(), to, amountValue, reason, "event");
+		for (Account a : bank.getAccounts()) {
+			bank.takeSaldo(amountValue);
+			if (a.getPlayer().equals(to)) {
+				a.addSaldo(amountValue);
+			}
+		}
+		bank.addTransfer(transfer);
+		return transfer;
+	}
+
+	public Transfer transferTo(String gameID, String from, String amount, String reason) {
+		Bank bank = findBank(gameID);
+		int amountValue = Integer.parseInt(amount);
+		// player from, to test
+		Transfer transfer = new Transfer(from, bank.getBankID(), amountValue, reason, "event");
+		for (Account a : bank.getAccounts()) {
+			bank.addSaldo(amountValue);
+			if (a.getPlayer().equals(from)) {
+				a.takeSaldo(amountValue);
+			}
+		}
+		bank.addTransfer(transfer);
+		return transfer;
+	}
+
+	public GetRequest getPlayers(String gameID) throws UnirestException {
+//		Bank bank = findBank(gameID);
+		String uri = "http://localhost:4568/games/" + gameID + "/players";
+		System.out.println("!!!!" +uri);
+		return Unirest.get(uri);
+//		JsonNode playerNode = playerResponse.asJson().getBody();
+//		System.out.println(playerNode + " pl node");
+//		JSONArray playerObj = playerNode.getArray();
+//		return playerObj;
+	}
+
+	public int getPlayersSaldo(String gameID, String playerID) throws UnirestException {
+		Bank bank = findBank(gameID);
+		HttpResponse<JsonNode> playerResponse = Unirest
+				.get("http://localhost:4567/games/" + gameID + "/players/" + playerID).asJson();
+		JsonNode playerNode = playerResponse.getBody();
+		JSONObject playerObj = playerNode.getObject();
+		String player = playerObj.getString("player");
+		for (Account a : bank.getAccounts()) {
+			if (a.getPlayer().equals(player)) {
+				return a.getSaldo();
+			}
+		}
+		return 0;
+	}
+	
+	public boolean createAccounts(String gameID) throws UnirestException {
+		Bank bank = findBank(gameID);
+		HttpResponse<JsonNode> playerResponse = Unirest
+				.get("http://localhost:4567/games/" + gameID + "/players").asJson();
+		JsonNode playerNode = playerResponse.getBody();
+		JSONObject playerObj = playerNode.getObject();
+		JSONArray players = playerObj.getJSONArray("player");
+		for (int i = 0; i < players.length() + 1; i++){
+			Account a = new Account(players.getString(i));
+				 bank.getAccounts().add(a);
+				 return true;
+				 
+			}
+		return false;
+	}
 }

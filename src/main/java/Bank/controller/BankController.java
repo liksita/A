@@ -9,52 +9,6 @@ import static spark.Spark.*;
 import static util.JsonUtil.json;
 
 
-/**
- * /banks/{gameid}:
- * type: { item: { schema: "bank", "example":"" } }
- * put:
- * body:
- * application/json:
- * schema: game
- * /transfers:
- * type: { list: { schema: "transfer", "example":"" } }
- * /{transferid}:
- * get:
- * description: Gets a <<resourcePathName>>
- * responses:
- * 200:
- * body:
- * application/json:
- * schema: transfer
- * example: |
- * {}
- * /transfer/from/{from}/to/{to}/{amount}:
- * post:
- * description: creates a new bank transfer
- * body:
- * application/json:
- * schema: '{"type":"string", "required":true}'
- * example: Rent for Badstrasse
- * responses:
- * 201:
- * description: A new bank transfer has been created
- * body:
- * application/json:
- * schema: events
- * 403:
- * description: insufficient fonds
- * <p>
- * // 3. Zustands abfrage vom Spiel
- * get("/games/:gameid" , (req, res) -> {
- * res.header("Content-Type", "application/json");
- * String gameID = req.params(":gameid");
- * String gameGson = "http://0.0.0.0:4567/games/" + gameID;
- * <p>
- * Game game = gson.fromJson(gameGson, Game.class);
- * <p>
- * return gson.toJson(game.isStarted());
- * });
- */
 
 public class BankController {
 
@@ -75,6 +29,8 @@ public class BankController {
         //===========================================================
 
         put("/banks/:gameid", (req, res) -> {
+        	
+//        	bankService.register();
 
             String gameID = req.params(":gameid");
 
@@ -141,67 +97,104 @@ public class BankController {
         // Creates a new bank transfer
         //===========================================================
 
-//        post("banks/:gameid/transfer/from/:from/to/:to/:amount", (req, res) -> {
-//            String reason = req.body();
-//
-//            Bank bank = bankService.findBank(req.params(":gameid"));
-//            if (bank == null) {
-//                res.status(400);
-//                return new ResponseError(":( wrong gameID");
-//            }
-//            Transfer transfer = bankService.transferFromTo(req.params(":gameid"), req.params(":from"), req.params(":to"), req.params(":amount"), reason);
-//            if (transfer == null) {
-//                res.status(400);
-//                return new ResponseError(":( wrong transferID");
-//            }
-//            return transfer;
-//        }, json());
+        post("banks/:gameid/transfer/from/:from/to/:to/:amount", (req, res) -> {
+            String reason = req.body();
+
+            Bank bank = bankService.findBank(req.params(":gameid"));
+            if (bank == null) {
+                res.status(400);
+                return new ResponseError(":( wrong gameID");
+            }
+            Transfer transfer = bankService.transferFromTo(req.params(":gameid"), req.params(":from"), req.params(":to"), req.params(":amount"), reason);
+            if (transfer == null) {
+                res.status(400);
+                return new ResponseError(":( wrong transferID");
+            }
+            return transfer;
+        }, json());
 //
 //        //===========================================================
 //        // Creates a new bank transfer from the bank itself
 //        //===========================================================
-//
-//        post("banks/:gameid/transfer/to/:to/:amount", (req, res) ->
-//                "ToDo", json()
-//        );
-//
-//        //===========================================================
-//        // creates a new bank transfer to the bank itself
-//        //===========================================================
-//        post("banks/:gameid/transfer/from/:from/:amount", (req, res) ->
-//                "ToDo", json()
-//        );
 
+        post("banks/:gameid/transfer/to/:to/:amount", (req, res) -> {
+            String reason = req.body();
+
+            Bank bank = bankService.findBank(req.params(":gameid"));
+            if (bank == null) {
+                res.status(400);
+                return new ResponseError(":( wrong gameID");
+            }
+            Transfer transfer = bankService.transferFrom(req.params(":gameid"), req.params(":to"), req.params(":amount"), reason);
+            if (transfer == null) {
+                res.status(400);
+                return new ResponseError(":( wrong transferID");
+            }
+            return transfer;
+        }, json());
+
+        //===========================================================
+        // creates a new bank transfer to the bank itself
+        //===========================================================
+        post("banks/:gameid/transfer/from/:from/:amount", (req, res) -> {
+            String reason = req.body();
+
+            Bank bank = bankService.findBank(req.params(":gameid"));
+            if (bank == null) {
+                res.status(400);
+                return new ResponseError(":( wrong gameID");
+            }
+            Transfer transfer = bankService.transferTo(req.params(":gameid"), req.params(":from"), req.params(":amount"), reason);
+            if (transfer == null) {
+                res.status(400);
+                return new ResponseError(":( wrong transferID");
+            }
+            return transfer;
+        }, json());
 
         //===========================================================
         // List of available players *
         //===========================================================
 
-//        get("banks/:gameid/players", (req, res) -> {
-//            Bank bank = bankService.findBank(req.params(":gameid"));
-//            if (bank == null) {
-//                res.status(400);
-//                return new ResponseError(":( wrong gameID");
-//            }
-//            HttpResponse<JsonNode> players = bankService.getPlayers(req.params(":gameid"));
-//            return players;
-//        });
+        get("banks/:gameid/players", (req, res) -> {
+            Bank bank = bankService.findBank(req.params(":gameid"));
+            if (bank == null) {
+                res.status(400);
+                return new ResponseError(":( wrong gameID");
+            }
+            try {
+				return bankService.getPlayers(req.params(":gameid"));
+			} catch (Exception e) {
+
+				res.status(404);
+				// TODO Auto-generated catch block
+				
+				e.printStackTrace();
+				return e;
+			}
+        });
 
 //        //===========================================================
 //        // Returns the saldo of the player
 //        //===========================================================
-//
-//        get("banks/:gameid/players/:playerid", (req, res) -> {
-//                    Bank bank = bankService.findBank(req.params(":gameid"));
-//                    if (bank == null) {
-//                        res.status(400);
-//                        return new ResponseError(":( wrong gameID");
-//                    }
-//
-//                    String r = "ToDo";
-//                    return r;
-//                }, json()
-//        );
+
+        get("banks/:gameid/players/:playerid", (req, res) -> {
+                    Bank bank = bankService.findBank(req.params(":gameid"));
+                    if (bank == null) {
+                        res.status(400);
+                        return new ResponseError(":( wrong gameID");
+                    }
+
+                    try {
+						return bankService.getPlayersSaldo(req.params(":gameid"), req.params(":playerid"));
+					} catch (Exception e) {
+						res.status(404);
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return e;
+					}
+                }, json()
+        );
 
         //===========================================================
         // Creates a bank account
@@ -214,19 +207,13 @@ public class BankController {
                         return new ResponseError(":( wrong gameID");
                     }
                     try {
-                        return bankService.getPlayersString(req.params(":gameid"));
+                        return bankService.createAccounts(req.params(":gameid"));
                     } catch (Exception e) {
+                    	res.status(404);
                         e.printStackTrace();
                         return e;
                     }
                 }
-
-//            bank.addAccount(playersArray);
-//
-//                    String r = "ToDo";
-//                    return r;
-//
-//                }, json()
 
 
         );
