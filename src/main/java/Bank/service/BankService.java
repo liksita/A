@@ -10,6 +10,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.GetRequest;
 
 import java.util.ArrayList;
 
@@ -128,13 +129,15 @@ public class BankService {
 		return transfer;
 	}
 
-	public JSONArray getPlayers(String gameID) throws UnirestException {
-		Bank bank = findBank(gameID);
-		HttpResponse<JsonNode> playerResponse = Unirest
-				.get("http://localhost:4567/games/" + gameID + "/players/").asJson();
-		JsonNode playerNode = playerResponse.getBody();
-		JSONArray playerObj = playerNode.getArray();
-		return playerObj;
+	public GetRequest getPlayers(String gameID) throws UnirestException {
+//		Bank bank = findBank(gameID);
+		String uri = "http://localhost:4568/games/" + gameID + "/players";
+		System.out.println("!!!!" +uri);
+		return Unirest.get(uri);
+//		JsonNode playerNode = playerResponse.asJson().getBody();
+//		System.out.println(playerNode + " pl node");
+//		JSONArray playerObj = playerNode.getArray();
+//		return playerObj;
 	}
 
 	public int getPlayersSaldo(String gameID, String playerID) throws UnirestException {
@@ -155,7 +158,7 @@ public class BankService {
 	public boolean createAccounts(String gameID) throws UnirestException {
 		Bank bank = findBank(gameID);
 		HttpResponse<JsonNode> playerResponse = Unirest
-				.get("http://localhost:4567/games/" + gameID + "/players/").asJson();
+				.get("http://localhost:4567/games/" + gameID + "/players").asJson();
 		JsonNode playerNode = playerResponse.getBody();
 		JSONObject playerObj = playerNode.getObject();
 		JSONArray players = playerObj.getJSONArray("player");

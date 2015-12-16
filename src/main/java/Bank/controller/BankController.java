@@ -30,7 +30,7 @@ public class BankController {
 
         put("/banks/:gameid", (req, res) -> {
         	
-        	bankService.register();
+//        	bankService.register();
 
             String gameID = req.params(":gameid");
 
@@ -165,8 +165,10 @@ public class BankController {
             try {
 				return bankService.getPlayers(req.params(":gameid"));
 			} catch (Exception e) {
+
 				res.status(404);
 				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 				return e;
 			}
