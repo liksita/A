@@ -19,22 +19,50 @@ import java.util.LinkedHashMap;
  */
 public class Bank {
     private String bankID;
-    private ArrayList<Transfer> transfers = new ArrayList<>();
-    private HashMap<String, Account> accounts = new LinkedHashMap<>();
+
+
+	private ArrayList<Transfer> transfers = new ArrayList<>();
+    private ArrayList<Account> accounts = new ArrayList<>();
+    private int saldo;
 
     public Bank(String bankID) {
         this.bankID = bankID;
-
+        this.saldo = 20000000;
     }
+    
 
-    public HashMap<String, Account> getAccounts() {
+	public int getSaldo() {
+		return saldo;
+	}
+
+	public void addSaldo(int saldo) {
+		this.saldo = this.saldo + saldo;
+	}
+	
+	public void takeSaldo(int saldo) {
+		this.saldo = this.saldo - saldo;
+	}
+
+	public void setBankID(String bankID) {
+		this.bankID = bankID;
+	}
+
+	public void setTransfers(ArrayList<Transfer> transfers) {
+		this.transfers = transfers;
+	}
+
+	public void setAccounts(ArrayList<Account> accounts) {
+		this.accounts = accounts;
+	}
+
+    public ArrayList<Account> getAccounts() {
         return accounts;
     }
 
-    public void addAccounts(ArrayList<Player> players) {
-        for (Player player : players) {
-            Account account = new Account();
-            accounts.put(player.getPlayerID(), account);
+    public void addAccounts(ArrayList<String> players) {
+        for (String player : players) {
+            Account account = new Account(player);
+            accounts.add(account);
         }
 
     }
@@ -51,4 +79,7 @@ public class Bank {
     public String getBankID() {
         return bankID;
     }
+    
+  
+    
 }
