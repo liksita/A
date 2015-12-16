@@ -15,11 +15,8 @@ public class DiceController {
     private static Dice dice = new Dice();
 
     public static void main( String[] args) {
-        get("/dice", (req, res) -> {
-        	ArrayList<Roll> rolls = new ArrayList<>();
-        	rolls.add(new Roll("roll1"));
-        	rolls.add(new Roll("roll2"));
-            return  rolls;
+        get("/dice", (req, res) -> {    	
+            return  new Dice();
         }, gson::toJson);
     }
 }

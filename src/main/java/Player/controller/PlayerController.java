@@ -7,6 +7,5 @@ import Player.service.PlayerService;
  */
 public class PlayerController {
     public PlayerController(PlayerService playerService) {
-
     }
 }

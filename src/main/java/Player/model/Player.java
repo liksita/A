@@ -2,25 +2,6 @@ package Player.model;
 
 import Boards.modell.Place;
 
-/**
- *
- * - player: |
-     {
-         "type": "object",
-         "$schema": "http://json-schema.org/draft-03/schema",
-         "id": "player",
-         "required": true,
-         "properties": {
-             "id":  { "type": "string", "required": true  },
-             "name":{ "type": "string" },
-             "uri":{ "type": "string" },
-             "place": { "$ref":"place" },
-             "position": { "type": "int" }
-         }
-     }
- example: |
-     [{ id:mario, name:"Mario", uri:"http://localhost:4567/player/mario", ready:false }]
- */
 public class Player {
     String playerID;
     String name;

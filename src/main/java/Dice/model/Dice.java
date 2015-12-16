@@ -11,10 +11,11 @@ import Boards.modell.Board;
  */
 public class Dice {
 
-    private int nummer;
+    private Roll roll1;
+    private Roll roll2;
 
     public Dice() {
-		this.nummer = new Random().nextInt(6) + 1;
+		this.roll1 = new Roll( new Random().nextInt(6) + 1);
+		this.roll2 = new Roll( new Random().nextInt(6) + 1);
 	}
-
 }

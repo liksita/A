@@ -9,7 +9,7 @@ import Game.service.GameService;
 import static spark.Spark.*;
 import static util.JsonUtil.json;
 
-//import com.sun.tools.javac.util.List;
+import com.mashape.unirest.http.Unirest;
 
 public class GameController {
 
@@ -22,19 +22,15 @@ public class GameController {
 		// ===========================================================
 		// URI: /games
 		// ===========================================================
-		// returns all available games 
+		// returns all available games
 		get("/games", (req, res) -> {
 			res.status(200);
 			return gameService.getGames();
 		} , json());
 
-		//  creates a new game 
+		// creates a new game
 		post("/games", (req, res) -> {
 			Game game = gameService.createGame();
-
-			// ToDo: bei Erstellung eines neuen Spieles ein neues Spielbrett
-			// erzeugt durch put/boards/{gameid}
-
 			res.status(201);
 			return game;
 		} , json());
@@ -42,7 +38,7 @@ public class GameController {
 		// ===========================================================
 		// URI: /games/{gameid}
 		// ===========================================================
-		//  returns the current game status 
+		// returns the current game status
 		get("/games/:gameid", (req, res) -> {
 			// prüfe ob spiel exiestiert
 			Game game = gameService.findGame(req.params(":gameid"));
@@ -106,7 +102,12 @@ public class GameController {
 			}
 
 			// prüfe ob spieler mit gleiche ID schon registriert ist
-			game = gameService.addPlayer(req.params(":gameid"), req.params(":playerid"));
+			try {
+				game = gameService.addPlayer(req.params(":gameid"), req.params(":playerid"));
+			} catch (Exception e) {
+				System.out.println("Configfile not found");
+				e.printStackTrace();
+			}
 			if (game == null) {
 				res.status(400);
 				return new ResponseError(":( player with same ID exist");
@@ -155,15 +156,6 @@ public class GameController {
 				return new ResponseError(":( no such player");
 			}
 
-			player.setReady();
-
-			// ToDo:
-			// Wenn alle Clients bereit sind, kann das Spiel beginnen – die
-			// erste Person muss anfangen zu würfeln!
-			// Achten Sie darauf, dass für die verschiedenen Spielkomponenten
-			// auch unterschiedliche Hosts
-			// über- bzw. angegeben werden können
-
 			return player;
 		} , json());
 
@@ -199,26 +191,27 @@ public class GameController {
 				return new ResponseError(":( wrong gameId");
 			}
 
-			// ToDo
+			// TODO
 			return null;
 		} , json());
 
 		// ===========================================================
 		// URl: /games/:gameid/players/turn
 		// ===========================================================
-		// ToDo
-		// GET: gets the player holding the turn mutex 
-		// Response 
+		// TODO
+		// GET: gets the player holding the turn mutex
+		// Response
 		// Http Status code 200
 		// Http Status code 404 Resource could not be found
-		
+
 		// PUT: tries to aquire the turn mutex - Request: Query parameters:
-		// player (string ), the playerid of the player trying to aquire the lock
+		// player (string ), the playerid of the player trying to aquire the
+		// lock
 		// Response
 		// Http Status code 200 already holding the mutex
 		// Http Status code 201 aquired the mutex
 		// Http Status code 409 already aquired by an other player
-		
+
 		// DELETE: releases the mutex
 	}
 }

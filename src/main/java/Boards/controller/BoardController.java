@@ -2,7 +2,6 @@ package Boards.controller;
 
 import Boards.modell.Board;
 import Boards.service.BoardService;
-import Game.model.Game;
 import Player.model.Player;
 import errors.ResponseError;
 
@@ -13,9 +12,6 @@ import static spark.Spark.put;
 import static spark.Spark.delete;
 import static util.JsonUtil.json;
 
-/**
- * Created by m on 25.11.15.
- */
 public class BoardController {
 
 	public BoardController(final BoardService boardService) {
@@ -213,7 +209,7 @@ public class BoardController {
 			return boardService.getField(req.params(":gameid"), req.params(":place"));
 		} , json());
 		
-		//   places a places 
+		// places a places 
 		put("boards/games/:gameid/places/:place", (req, res) -> {
 			// prüfe ob spiel exiestiert
 			Board board = boardService.findBoard(req.params(":gameid"));
@@ -226,6 +222,5 @@ public class BoardController {
 			// wurde geklappt
 			return boardService.setField(req.params(":gameid"), req.params(":place"));
 		} , json());
-
 	}
 }

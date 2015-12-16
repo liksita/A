@@ -2,27 +2,6 @@ package Boards.modell;
 
 import Dice.model.Roll;
 
-/**
-
- - throw: |
- {
-     "type":        "object",
-     "$schema":     "http://json-schema.org/draft-03/schema",
-     "id":          "throw",
-     "required":    true,
-     "description": "two rolls together as a throw",
-     "properties":  {
-         "roll1": {
-            "$ref":     "roll",
-            "required": true
-         },
-         "roll2": {
-            "$ref":     "roll",
-            "required": true
-        }
-     }
- }
- */
 public class Throw {
 
     private Roll roll1;

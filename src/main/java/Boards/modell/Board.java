@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import Boards.service.Field;
-import Player.model.Player;
-
 public class Board {
 	private String gameid;
 
