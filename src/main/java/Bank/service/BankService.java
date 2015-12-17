@@ -1,21 +1,14 @@
 package Bank.service;
 
-import Bank.model.Account;
-import Bank.model.Bank;
-import Bank.model.Service;
-import Bank.model.Transfer;
-import Player.model.Player;
+import Bank.model.*;
 import com.google.gson.Gson;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.*;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
 
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.*;
 
 import static util.JsonUtil.readUrl;
 
@@ -26,10 +19,10 @@ public class BankService {
 
 	private ArrayList<Bank> banks = new ArrayList<>();
 
-	private static Service service = new Service("Games", "Game Service", "games",
+	private static Service service = new Service("Games", "Game Service diana & max", "games",
 			"https://vs-docker.informatik.haw-hamburg.de/ports/14470/games");
 
-	private static String serviceRegistrationUri = "http://vs-docker.informatik.haw-hamburg.de:8053/services";
+	private static String serviceRegistrationUri = "https://vs-docker.informatik.haw-hamburg.de/ports/8053/services";
 
 	public void register() {
 		Gson gson = new Gson();
@@ -129,45 +122,49 @@ public class BankService {
 		return transfer;
 	}
 
-	public GetRequest getPlayers(String gameID) throws UnirestException {
+	public JSONArray getPlayers(String gameID) throws UnirestException {
 //		Bank bank = findBank(gameID);
 		String uri = "http://localhost:4568/games/" + gameID + "/players";
-		System.out.println("!!!!" +uri);
-		return Unirest.get(uri);
-//		JsonNode playerNode = playerResponse.asJson().getBody();
-//		System.out.println(playerNode + " pl node");
-//		JSONArray playerObj = playerNode.getArray();
-//		return playerObj;
+		GetRequest req = Unirest.get(uri);
+		JsonNode playerNode = req.asJson().getBody();
+		JSONArray playerObj = playerNode.getArray();
+		return playerObj;
 	}
 
 	public int getPlayersSaldo(String gameID, String playerID) throws UnirestException {
 		Bank bank = findBank(gameID);
 		HttpResponse<JsonNode> playerResponse = Unirest
-				.get("http://localhost:4567/games/" + gameID + "/players/" + playerID).asJson();
+				.get("http://localhost:4568/games/" + gameID + "/players/" + playerID).asJson();
 		JsonNode playerNode = playerResponse.getBody();
+		System.out.println("pl node " + playerNode);
 		JSONObject playerObj = playerNode.getObject();
-		String player = playerObj.getString("player");
+		System.out.println("playerObj" + " obj");
+		String player = playerObj.getString("playerID");
 		for (Account a : bank.getAccounts()) {
+			System.out.println(a.getPlayer() + " player1");
+			System.out.println(player + " player2");
+			
 			if (a.getPlayer().equals(player)) {
+				
 				return a.getSaldo();
 			}
 		}
 		return 0;
 	}
 	
-	public boolean createAccounts(String gameID) throws UnirestException {
+	public ArrayList<Account> createAccounts(String gameID) throws UnirestException {
 		Bank bank = findBank(gameID);
 		HttpResponse<JsonNode> playerResponse = Unirest
-				.get("http://localhost:4567/games/" + gameID + "/players").asJson();
+				.get("http://localhost:4568/games/" + gameID + "/players").asJson();
 		JsonNode playerNode = playerResponse.getBody();
 		JSONObject playerObj = playerNode.getObject();
-		JSONArray players = playerObj.getJSONArray("player");
-		for (int i = 0; i < players.length() + 1; i++){
-			Account a = new Account(players.getString(i));
+		JSONArray players = playerNode.getArray();
+		for (int i = 0; i < players.length(); i++){
+			Account a = new Account(players.get(i).toString());
 				 bank.getAccounts().add(a);
-				 return true;
 				 
 			}
-		return false;
+		return bank.getAccounts();
+		 
 	}
 }
