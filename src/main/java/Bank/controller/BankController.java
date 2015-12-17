@@ -30,7 +30,7 @@ public class BankController {
 
         put("/banks/:gameid", (req, res) -> {
         	
-//        	bankService.register();
+        	bankService.register();
 
             String gameID = req.params(":gameid");
 
@@ -41,6 +41,7 @@ public class BankController {
                 res.status(400);
                 return new ResponseError(":( wrong gameID, such bank already exists");
             }
+            
 
             // if game exists
 
@@ -182,7 +183,9 @@ public class BankController {
                     Bank bank = bankService.findBank(req.params(":gameid"));
                     if (bank == null) {
                         res.status(400);
+                        System.out.println("??????????????");
                         return new ResponseError(":( wrong gameID");
+                       
                     }
 
                     try {
@@ -200,7 +203,7 @@ public class BankController {
         // Creates a bank account
         //===========================================================
 
-        get("banks/:gameid/players", (req, res) -> {
+        post("banks/:gameid/players", (req, res) -> {
                     Bank bank = bankService.findBank(req.params(":gameid"));
                     if (bank == null) {
                         res.status(400);

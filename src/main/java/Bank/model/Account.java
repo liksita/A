@@ -49,7 +49,7 @@ public class Account {
 		this.player = player;
 	}
 	public int getSaldo() {
-		return saldo;
+		return this.saldo;
 	}
 	public void addSaldo(int saldo) {
 		this.saldo = this.saldo + saldo;
